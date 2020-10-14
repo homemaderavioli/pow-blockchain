@@ -1,0 +1,37 @@
+// GOSSIP protocol
+// * no leader
+// * operates offline
+// * bootstrap the network
+// * eventual consistent - p2p relay messages
+
+// problem - Byzantine fault tolerance
+// * how can we establish identity? pub key encryption
+// * gen key pair
+// * private key can sign the message
+// * verify by shared public key
+// # crypto identity
+
+// problem - double spend
+// * no global ordering of events in a distributed system
+// * people can lie
+// * need to coordinate by slowing things down
+// Solution:
+// * slow things down
+// * order all events
+// * hard to change that ordering
+// * == decentralized timestamping server
+// * == Proof of Work - for the message
+// * SHA256 hash
+// * find a nonce, which combined with your message generates a hash with 4 leading zeros
+// * == blockchain
+// * seqeunce of puzzle solutions
+// * each block has a prev block hash
+// * has to be correct hash order
+
+// problem - forks
+// * accept the fork with the most block / work
+// * wait 6 blocks before a transaction is final
+
+// Identity - PK crypto
+// Networking - gossip protocol
+// Consensus - proof of work, longest chain rule, each node revalidates each block in the blockchain
