@@ -25,6 +25,13 @@ func GenerateKeyPair() KeyPair {
 	}
 }
 
+type MessageHash []byte
+
+func SignMessage(message MessageHash) []byte {
+	keyPair := GenerateKeyPair()
+	return Sign(keyPair.PrivateKey, message)
+}
+
 func Sign(privateKey *rsa.PrivateKey, message []byte) []byte {
 	signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, message)
 	if err != nil {
