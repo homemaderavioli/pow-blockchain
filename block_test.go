@@ -25,7 +25,7 @@ func TestHasValidNonce(t *testing.T) {
 		Message:           Message{},
 		PreviousBlockHash: nil,
 	}
-	bSerialized := block.blockSerialized()
+	bSerialized := blockSerialized(block)
 	hasLeadingZeros := blockHashHasLeadingZeros(bSerialized)
 	if hasLeadingZeros == false {
 		t.Errorf("not found")
@@ -38,7 +38,7 @@ func TestHasInvalidNonce(t *testing.T) {
 		Message:           Message{},
 		PreviousBlockHash: nil,
 	}
-	bSerialized := block.blockSerialized()
+	bSerialized := blockSerialized(block)
 	hasLeadingZeros := blockHashHasLeadingZeros(bSerialized)
 	if hasLeadingZeros {
 		t.Errorf("not found")

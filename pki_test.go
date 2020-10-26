@@ -8,7 +8,7 @@ import (
 func TestGenerateKeyPair(t *testing.T) {
 	keyPair := GenerateKeyPair()
 	if keyPair.PrivateKey == nil || keyPair.PublicKey == nil {
-		t.Error()
+		t.Error("could not generate keypair")
 	}
 }
 
@@ -21,7 +21,7 @@ func TestSign(t *testing.T) {
 
 	signature := Sign(keyPair.PrivateKey, hashedMessage[:])
 	if signature == nil {
-		t.Error("Failed to sign message")
+		t.Error("failed to sign message")
 	}
 }
 
@@ -30,27 +30,25 @@ func TestVerifySignature(t *testing.T) {
 
 	message := []byte("hello world")
 
-	hashedMessage := sha256.Sum256(message)
+	hashedMessage := Sha256Hash(message)
 
-	signature := Sign(keyPair.PrivateKey, hashedMessage[:])
+	signature := Sign(keyPair.PrivateKey, hashedMessage)
 
-	verified := VerifySignature(keyPair.PublicKey, hashedMessage[:], signature)
+	verified := VerifySignature(keyPair.PublicKey, hashedMessage, signature)
 	if verified == false {
-		t.Error()
+		t.Errorf("expected signature to be valid, got %v", verified)
 	}
 }
 
-func TestVerifyMessage(t *testing.T) {
+func TestVerifySignatureError(t *testing.T) {
 	keyPair := GenerateKeyPair()
 
 	message := []byte("hello world")
 
-	hashedMessage := sha256.Sum256(message)
+	signature := Sign(keyPair.PrivateKey, message)
 
-	Sign(keyPair.PrivateKey, hashedMessage[:])
-
-	verified := VerifyMessage(message, hashedMessage)
-	if verified == false {
-		t.Error()
+	verified := VerifySignature(keyPair.PublicKey, message, signature)
+	if verified != false {
+		t.Error("signature should not be verifiable, as the message is not hashed")
 	}
 }
