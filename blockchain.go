@@ -1,50 +1,62 @@
 package main
 
-type LinkedBlock struct {
-	block     *Block
-	nextBlock *Block
-	prevBlock *Block
-}
+import (
+	"bytes"
+	"errors"
+)
 
 type Blockchain struct {
-	currentBlock *LinkedBlock
-	length       int
+	blocks []*Block
 }
 
 func New(block *Block) *Blockchain {
-	currectBlock := &LinkedBlock{
-		block:     block,
-		nextBlock: nil,
-		prevBlock: nil,
-	}
-
+	blocks := make([]*Block, 0)
+	blocks = append(blocks, block)
 	blockchain := &Blockchain{
-		currentBlock: currectBlock,
-		length:       1,
+		blocks: blocks,
 	}
 
 	return blockchain
 }
 
-func (bc *Blockchain) addBlock(block *Block) {
-	topBlock := bc.currentBlock
-	topBlock.nextBlock = block
+func (bc *Blockchain) length() int {
+	return len(bc.blocks)
+}
 
-	bc.currentBlock = &LinkedBlock{
-		block:     block,
-		nextBlock: nil,
-		prevBlock: topBlock.block,
+func (bc *Blockchain) addBlock(block *Block) error {
+	currentBlock := bc.getTopBlock()
+
+	if validLink(block, currentBlock) == false {
+		return errors.New("cannot add block as the link is invalid")
 	}
-	bc.length++
+
+	bc.blocks = append(bc.blocks, block)
+	return nil
+}
+
+func (bc *Blockchain) getTopBlock() *Block {
+	return bc.blocks[len(bc.blocks)-1]
 }
 
 func (bc *Blockchain) getTopBlockHash() []byte {
-	bSerialized := blockSerialized(bc.currentBlock.block)
-	hash := Sha256Hash(bSerialized)
-	return hash
+	block := bc.getTopBlock()
+	return block.blockHash()
 }
 
-func (bc *Blockchain) validateBlockChain() bool {
+func (bc *Blockchain) validateBlockChain() error {
+	for i := 1; i < len(bc.blocks); i++ {
+		currentBlock := bc.blocks[i]
+		previousBlock := bc.blocks[i-1]
 
-	return false
+		if validLink(currentBlock, previousBlock) == false {
+			return errors.New("blockchain has an invalid link")
+		}
+	}
+	return nil
+}
+
+func validLink(a *Block, b *Block) bool {
+	aHash := a.PreviousBlockHash
+	bHash := b.blockHash()
+	return bytes.Compare(aHash, bHash) == 0
 }

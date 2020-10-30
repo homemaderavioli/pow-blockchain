@@ -27,6 +27,12 @@ func GenesisBlock(message Message) *Block {
 	return block
 }
 
+func (b *Block) blockHash() []byte {
+	bSerialized := blockSerialized(b)
+	hash := Sha256Hash(bSerialized)
+	return hash
+}
+
 func (b *Block) findNonce() bool {
 	for nonce := 0; nonce < maxNonceLimit; nonce++ {
 		if b.tryNonce(nonce) {
