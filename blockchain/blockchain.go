@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"bytes"
+	"crypto/rsa"
 	"errors"
 )
 
@@ -29,8 +30,35 @@ func initialise(block *Block) *Blockchain {
 	return blockchain
 }
 
-func (bc *Blockchain) length() int {
+func (bc *Blockchain) Blocks() []Block {
+	blocks := make([]Block, 0)
+	for i := 0; i < bc.Length(); i++ {
+		blocks = append(blocks, *bc.blocks[i])
+	}
+	return blocks
+}
+
+func (bc *Blockchain) Length() int {
 	return len(bc.blocks)
+}
+
+func (bc *Blockchain) AddToChain(privateKey *rsa.PrivateKey, data []byte) error {
+	message := buildSignedMessage(privateKey, data)
+
+	verified := verifyMessage(message.Message, message.MessageHash)
+	if verified == false {
+		return errors.New("message could not be verified")
+	}
+
+	blockNumber := bc.Length()
+	previousBlockHash := bc.getTopBlockHash()
+	block := newBlock(blockNumber, message, previousBlockHash)
+
+	err := bc.addBlock(block)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (bc *Blockchain) addBlock(block *Block) error {

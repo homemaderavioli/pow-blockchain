@@ -22,7 +22,7 @@ func GenerateKeyPair() KeyPair {
 	}
 }
 
-func Sign(privateKey *rsa.PrivateKey, message []byte) []byte {
+func sign(privateKey *rsa.PrivateKey, message []byte) []byte {
 	signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, message)
 	if err != nil {
 		return nil
@@ -30,7 +30,7 @@ func Sign(privateKey *rsa.PrivateKey, message []byte) []byte {
 	return signature
 }
 
-func VerifySignature(publicKey *rsa.PublicKey, message []byte, signature []byte) bool {
+func verifySignature(publicKey *rsa.PublicKey, message []byte, signature []byte) bool {
 	err := rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, message, signature)
 	if err == nil {
 		return true

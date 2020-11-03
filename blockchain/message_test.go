@@ -9,7 +9,7 @@ func TestVerifySignedMessage(t *testing.T) {
 
 	message := buildSignedMessage(keyPair.PrivateKey, messageData)
 
-	verified := VerifyMessage(message.Message, message.MessageHash)
+	verified := verifyMessage(message.Message, message.MessageHash)
 	if verified == false {
 		t.Errorf("expected the message to be valid, got %t", verified)
 	}
@@ -18,9 +18,9 @@ func TestVerifySignedMessage(t *testing.T) {
 func TestVerifyMessage(t *testing.T) {
 	message := []byte("hello world")
 
-	hashedMessage := Sha256Hash(message)
+	hashedMessage := hash(message)
 
-	verified := VerifyMessage(message, hashedMessage)
+	verified := verifyMessage(message, hashedMessage)
 	if verified == false {
 		t.Errorf("expected the message to be valid, got %t", verified)
 	}

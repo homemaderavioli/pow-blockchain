@@ -34,7 +34,7 @@ func TestGetGenesisBlockNonce(t *testing.T) {
 func TestNewBlockchain(t *testing.T) {
 	genesisBlock := getGenesisBlock()
 	blockchain := initialise(genesisBlock)
-	if blockchain.length() != 1 {
+	if blockchain.Length() != 1 {
 		t.Errorf("should be length of 1")
 	}
 }
@@ -49,7 +49,7 @@ func TestAddBlockToBlockchain(t *testing.T) {
 	blockchain := initialise(genesisBlock)
 
 	message := buildUnsignedMessage([]byte("haha 1337"))
-	blockNumber := blockchain.length()
+	blockNumber := blockchain.Length()
 	previousBlockHash := blockchain.getTopBlockHash()
 
 	block := &Block{
@@ -68,7 +68,7 @@ func TestAddBlockToBlockchain(t *testing.T) {
 		t.Errorf("%s", err)
 	}
 
-	if blockchain.length() != 2 {
+	if blockchain.Length() != 2 {
 		t.Errorf("should be length of 2")
 	}
 }
@@ -83,7 +83,7 @@ func TestAddInvalidBlockToBlockchain(t *testing.T) {
 	blockchain := initialise(genesisBlock)
 
 	message := buildUnsignedMessage([]byte("haha 1337"))
-	blockNumber := blockchain.length()
+	blockNumber := blockchain.Length()
 	previousBlockHash := blockchain.getTopBlockHash()
 
 	block := &Block{
@@ -113,7 +113,7 @@ func TestValidateBlockChain(t *testing.T) {
 	blockchain := initialise(genesisBlock)
 
 	message := buildUnsignedMessage([]byte("haha 1337"))
-	blockNumber := blockchain.length()
+	blockNumber := blockchain.Length()
 	previousBlockHash := blockchain.getTopBlockHash()
 
 	block := &Block{
@@ -143,7 +143,7 @@ func TestInvalidateBlockChain(t *testing.T) {
 	blockchain := initialise(genesisBlock)
 
 	message := buildUnsignedMessage([]byte("haha 1337"))
-	blockNumber := blockchain.length()
+	blockNumber := blockchain.Length()
 	previousBlockHash := blockchain.getTopBlockHash()
 
 	block := &Block{

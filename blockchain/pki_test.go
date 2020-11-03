@@ -1,7 +1,6 @@
 package blockchain
 
 import (
-	"crypto/sha256"
 	"testing"
 )
 
@@ -17,9 +16,9 @@ func TestSign(t *testing.T) {
 
 	message := []byte("hello world")
 
-	hashedMessage := sha256.Sum256(message)
+	hashedMessage := hash(message)
 
-	signature := Sign(keyPair.PrivateKey, hashedMessage[:])
+	signature := sign(keyPair.PrivateKey, hashedMessage)
 	if signature == nil {
 		t.Error("failed to sign message")
 	}
@@ -30,11 +29,11 @@ func TestVerifySignature(t *testing.T) {
 
 	message := []byte("hello world")
 
-	hashedMessage := Sha256Hash(message)
+	hashedMessage := hash(message)
 
-	signature := Sign(keyPair.PrivateKey, hashedMessage)
+	signature := sign(keyPair.PrivateKey, hashedMessage)
 
-	verified := VerifySignature(keyPair.PublicKey, hashedMessage, signature)
+	verified := verifySignature(keyPair.PublicKey, hashedMessage, signature)
 	if verified == false {
 		t.Errorf("expected signature to be valid, got %v", verified)
 	}
@@ -45,9 +44,9 @@ func TestVerifySignatureError(t *testing.T) {
 
 	message := []byte("hello world")
 
-	signature := Sign(keyPair.PrivateKey, message)
+	signature := sign(keyPair.PrivateKey, message)
 
-	verified := VerifySignature(keyPair.PublicKey, message, signature)
+	verified := verifySignature(keyPair.PublicKey, message, signature)
 	if verified != false {
 		t.Error("signature should not be verifiable, as the message is not hashed")
 	}

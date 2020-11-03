@@ -12,8 +12,8 @@ type Message struct {
 }
 
 func buildSignedMessage(privateKey *rsa.PrivateKey, message []byte) Message {
-	messageHash := Sha256Hash(message)
-	messageSignature := Sign(privateKey, messageHash)
+	messageHash := hash(message)
+	messageSignature := sign(privateKey, messageHash)
 	return Message{
 		Message:          message,
 		MessageHash:      messageHash,
@@ -21,8 +21,8 @@ func buildSignedMessage(privateKey *rsa.PrivateKey, message []byte) Message {
 	}
 }
 
-func VerifyMessage(recievedMessage []byte, recievedMessageHash []byte) bool {
-	hashOfRecievedMessage := Sha256Hash(recievedMessage)
+func verifyMessage(recievedMessage []byte, recievedMessageHash []byte) bool {
+	hashOfRecievedMessage := hash(recievedMessage)
 	if bytes.Compare(hashOfRecievedMessage, recievedMessageHash) == 0 {
 		return true
 	}

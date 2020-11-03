@@ -59,7 +59,7 @@ func blockSerialized(b *Block) []byte {
 }
 
 func blockHashHasLeadingZeros(block []byte) bool {
-	blockHash := Sha256Hash(block)
+	blockHash := hash(block)
 	hexBlockHash := hex.EncodeToString(blockHash)
 	leadingNCharacters := hexBlockHash[:numberOfLeadingZeros]
 	if leadingNCharacters == strings.Repeat("0", numberOfLeadingZeros) {
@@ -70,6 +70,14 @@ func blockHashHasLeadingZeros(block []byte) bool {
 
 func (b *Block) blockHash() []byte {
 	bSerialized := blockSerialized(b)
-	hash := Sha256Hash(bSerialized)
+	hash := hash(bSerialized)
 	return hash
+}
+
+func (b *Block) prettyPrint() {
+	fmt.Printf("==== BLOCK %d ====\n", b.BlockNumber)
+	fmt.Printf("Nonce: %d\n", b.Nonce)
+	fmt.Printf("Data: %s\n", b.Message.Message)
+	fmt.Printf("Previous block hash: %s\n", hex.EncodeToString(b.PreviousBlockHash))
+	fmt.Println("=================")
 }

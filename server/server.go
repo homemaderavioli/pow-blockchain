@@ -2,8 +2,12 @@ package server
 
 import (
 	"bytes"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
-	"fmt"
+	"encoding/pem"
+	"errors"
 	"log"
 	"net/http"
 
@@ -23,6 +27,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) Routes() {
 	s.Router.HandleFunc("/gossip", cors(s.handleGossip()))
+	s.Router.HandleFunc("/send_money", cors(s.handleSendMoney()))
+	s.Router.HandleFunc("/public_key", cors(s.handlePublicKey()))
 }
 
 func cors(h http.HandlerFunc) http.HandlerFunc {
@@ -40,9 +46,6 @@ func cors(h http.HandlerFunc) http.HandlerFunc {
 }
 
 func (s *Server) handleGossip() http.HandlerFunc {
-	var response struct {
-		blockchain blockchain.Blockchain
-	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		//if r.Method != http.MethodPost {
 		//	respondWithError(w, r, errors.New("bad request"), http.StatusBadRequest)
@@ -54,19 +57,63 @@ func (s *Server) handleGossip() http.HandlerFunc {
 		//updateBlockchain(theirBlockchain)
 		//updatePeers(theirPeers)
 
-		fmt.Printf("%v\n", *s.Blockchain)
+		blocks := s.Blockchain.Blocks()
+		respond(w, r, blocks, http.StatusOK)
+	}
+}
 
-		response.blockchain = *s.Blockchain
+func (s *Server) handleSendMoney() http.HandlerFunc {
+	var request struct {
+		Message string `json:"message"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := decode(r, &request)
+		if err != nil {
+			respondWithError(w, r, err, http.StatusBadRequest)
+			return
+		}
+
+		err = s.Blockchain.AddToChain(s.NodeKeyPair.PrivateKey, []byte(request.Message))
+		if err != nil {
+			respondWithError(w, r, err, http.StatusBadRequest)
+			return
+		}
+		respond(w, r, nil, http.StatusCreated)
+	}
+}
+
+func (s *Server) handlePublicKey() http.HandlerFunc {
+	var response struct {
+		PublicKey string `json:"public_key"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		publicKey, err := getBase64PublicKey(s.NodeKeyPair.PublicKey)
+		if err != nil {
+			respondWithError(w, r, errors.New("there was a problem"), http.StatusInternalServerError)
+			return
+		}
+
+		response.PublicKey = publicKey
 		respond(w, r, response, http.StatusOK)
 	}
 }
 
-func updateBlockchain(theirBlockchain string) {
+func getBase64PublicKey(publicKey *rsa.PublicKey) (string, error) {
+	publicKeyData, _ := x509.MarshalPKIXPublicKey(publicKey)
+	publicKeyBlock := &pem.Block{
+		Type:  "PUBLIC KEY",
+		Bytes: publicKeyData,
+	}
 
-}
+	var keyBuffer bytes.Buffer
 
-func updatePeers(theirPeers string) {
+	err := pem.Encode(&keyBuffer, publicKeyBlock)
+	if err != nil {
+		return "", err
+	}
 
+	base64PublicKey := base64.StdEncoding.EncodeToString(keyBuffer.Bytes())
+	return base64PublicKey, nil
 }
 
 func respondWithError(w http.ResponseWriter, r *http.Request, err error, code int) {
