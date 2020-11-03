@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -26,10 +27,22 @@ func run(args []string, stdout io.Writer) error {
 		log.Printf("port set to %s", port)
 	}
 
-	//peers := strings.Split(os.Getenv("PEERS"), ",")
+	name := os.Getenv("NAME")
+	if name == "" {
+		return errors.New("NAME must be set")
+	}
+	log.Printf("name set to %s", name)
 
 	keyPair := pki.GenerateKeyPair()
-	bc := blockchain.New(keyPair.PrivateKey)
+	bc := &blockchain.Blockchain{}
+
+	//peer := os.Getenv("PEER")
+	//if peer == "" {
+	// start new blockchain
+	bc = blockchain.New(keyPair.PrivateKey)
+	//} else {
+
+	//}
 
 	srv := &server.Server{
 		NodeKeyPair: keyPair,
@@ -37,6 +50,7 @@ func run(args []string, stdout io.Writer) error {
 		Port:        port,
 		Router:      http.NewServeMux(),
 	}
+
 	srv.Routes()
 	return http.ListenAndServe(":"+port, srv)
 }

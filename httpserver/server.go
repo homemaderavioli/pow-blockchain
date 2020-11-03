@@ -10,6 +10,7 @@ import (
 type Server struct {
 	NodeKeyPair pki.KeyPair
 	Blockchain  *blockchain.Blockchain
+	Peers       Peers
 	Port        string
 	Router      *http.ServeMux
 }
