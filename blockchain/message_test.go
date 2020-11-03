@@ -1,9 +1,14 @@
 package blockchain
 
-import "testing"
+import (
+	"testing"
+
+	hash "pow-blockchain/hash"
+	pki "pow-blockchain/pki"
+)
 
 func TestVerifySignedMessage(t *testing.T) {
-	keyPair := GenerateKeyPair()
+	keyPair := pki.GenerateKeyPair()
 
 	messageData := []byte("hello world")
 
@@ -18,7 +23,7 @@ func TestVerifySignedMessage(t *testing.T) {
 func TestVerifyMessage(t *testing.T) {
 	message := []byte("hello world")
 
-	hashedMessage := hash(message)
+	hashedMessage := hash.Hash(message)
 
 	verified := verifyMessage(message, hashedMessage)
 	if verified == false {

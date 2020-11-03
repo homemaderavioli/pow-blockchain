@@ -3,6 +3,9 @@ package blockchain
 import (
 	"bytes"
 	"crypto/rsa"
+
+	hash "pow-blockchain/hash"
+	pki "pow-blockchain/pki"
 )
 
 type Message struct {
@@ -12,8 +15,8 @@ type Message struct {
 }
 
 func buildSignedMessage(privateKey *rsa.PrivateKey, message []byte) Message {
-	messageHash := hash(message)
-	messageSignature := sign(privateKey, messageHash)
+	messageHash := hash.Hash(message)
+	messageSignature := pki.Sign(privateKey, messageHash)
 	return Message{
 		Message:          message,
 		MessageHash:      messageHash,
@@ -22,7 +25,7 @@ func buildSignedMessage(privateKey *rsa.PrivateKey, message []byte) Message {
 }
 
 func verifyMessage(recievedMessage []byte, recievedMessageHash []byte) bool {
-	hashOfRecievedMessage := hash(recievedMessage)
+	hashOfRecievedMessage := hash.Hash(recievedMessage)
 	if bytes.Compare(hashOfRecievedMessage, recievedMessageHash) == 0 {
 		return true
 	}

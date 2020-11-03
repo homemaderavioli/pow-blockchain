@@ -4,6 +4,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strings"
+
+	hash "pow-blockchain/hash"
 )
 
 type Block struct {
@@ -21,12 +23,12 @@ func genesisBlock(message Message) *Block {
 	return block
 }
 
-func newBlock(number int, message Message, hash []byte) *Block {
+func newBlock(number int, message Message, previousHash []byte) *Block {
 	block := &Block{
 		BlockNumber:       number,
 		Nonce:             0,
 		Message:           message,
-		PreviousBlockHash: hash,
+		PreviousBlockHash: previousHash,
 	}
 	block.findNonce()
 	return block
@@ -59,7 +61,7 @@ func blockSerialized(b *Block) []byte {
 }
 
 func blockHashHasLeadingZeros(block []byte) bool {
-	blockHash := hash(block)
+	blockHash := hash.Hash(block)
 	hexBlockHash := hex.EncodeToString(blockHash)
 	leadingNCharacters := hexBlockHash[:numberOfLeadingZeros]
 	if leadingNCharacters == strings.Repeat("0", numberOfLeadingZeros) {
@@ -70,7 +72,7 @@ func blockHashHasLeadingZeros(block []byte) bool {
 
 func (b *Block) blockHash() []byte {
 	bSerialized := blockSerialized(b)
-	hash := hash(bSerialized)
+	hash := hash.Hash(bSerialized)
 	return hash
 }
 

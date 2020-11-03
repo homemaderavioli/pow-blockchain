@@ -10,9 +10,9 @@ type Blockchain struct {
 	blocks []*Block
 }
 
-func New(keyPair KeyPair) *Blockchain {
+func New(privateKey *rsa.PrivateKey) *Blockchain {
 	messageData := []byte("hello world")
-	message := buildSignedMessage(keyPair.PrivateKey, messageData)
+	message := buildSignedMessage(privateKey, messageData)
 	block := genesisBlock(message)
 
 	blockchain := initialise(block)

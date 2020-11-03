@@ -8,7 +8,8 @@ import (
 	"os"
 
 	blockchain "pow-blockchain/blockchain"
-	server "pow-blockchain/server"
+	server "pow-blockchain/httpserver"
+	pki "pow-blockchain/pki"
 )
 
 func main() {
@@ -27,8 +28,8 @@ func run(args []string, stdout io.Writer) error {
 
 	//peers := strings.Split(os.Getenv("PEERS"), ",")
 
-	keyPair := blockchain.GenerateKeyPair()
-	bc := blockchain.New(keyPair)
+	keyPair := pki.GenerateKeyPair()
+	bc := blockchain.New(keyPair.PrivateKey)
 
 	srv := &server.Server{
 		NodeKeyPair: keyPair,
